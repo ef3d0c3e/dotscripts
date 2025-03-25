@@ -7,6 +7,15 @@ CACHEDIR=${XDG_CACHE_HOME:-/tmp}
 HIST_FILE=$(cfg_file "${CACHEDIR}/rofi-calc/calculator.history")
 ACTION="$(gui_menu "calc" "$(cat "${HIST_FILE}" || true)")"
 
+# bc backend
+do_calc_bc()
+{
+	answer=$(echo "${ACTION}" | bc -l)
+	fmt=$(printf "%s = %s\n" "${ACTION}" "${answer}" | cat - "${HIST_FILE}")
+	printf "%s" "${fmt}" > "${HIST_FILE}"
+	return 0
+}
+
 # Giac (Xcas) backend
 do_calc_giac()
 {
@@ -28,5 +37,5 @@ do_calc_qalc()
 case ${ACTION} in
 	*clear*) rm "${HIST_FILE}" && $0 ;;
 	"") ;;
-	*) do_calc_giac "${ACTION}" && $0 ;;
+	*) do_calc_bc "${ACTION}" && $0 ;;
 esac
