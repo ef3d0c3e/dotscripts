@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # 'rofi' or 'dmenu' (default)
-GUI_MENU='dmenu'
+GUI_MENU='rofi'
 
 notify_err()
 {

@@ -37,10 +37,10 @@ do_calc_qalc()
 	return 0
 }
 
-case ${ACTION} in
+case "${ACTION}" in
 	*clear*) rm "${HIST_FILE}" && $0 ;;
 	"") ;;
-	*) case ${BACKEND} in
+	*) case "${BACKEND}" in
 		'bc') do_calc_bc "${ACTION}" && $0 ;;
 		'giac') do_calc_giac "${ACTION}" && $0 ;;
 		'qalc') do_calc_qalc "${ACTION}" && $0 ;;
