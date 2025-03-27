@@ -7,6 +7,9 @@ CACHEDIR=${XDG_CACHE_HOME:-/tmp}
 HIST_FILE=$(cfg_file "${CACHEDIR}/rofi-calc/calculator.history")
 ACTION="$(gui_menu "calc" "$(cat "${HIST_FILE}" || true)")"
 
+# Chosen backend, one of 'bc', 'giac' or 'qalc'
+BACKEND='giac'
+
 # bc backend
 do_calc_bc()
 {
@@ -37,5 +40,10 @@ do_calc_qalc()
 case ${ACTION} in
 	*clear*) rm "${HIST_FILE}" && $0 ;;
 	"") ;;
-	*) do_calc_bc "${ACTION}" && $0 ;;
+	*) case ${BACKEND} in
+		'bc') do_calc_bc "${ACTION}" && $0 ;;
+		'giac') do_calc_giac "${ACTION}" && $0 ;;
+		'qalc') do_calc_qalc "${ACTION}" && $0 ;;
+		*) notify_err "Unknown backend: '${BACKEND}'" ;;
+	esac ;;
 esac

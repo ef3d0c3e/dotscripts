@@ -1,8 +1,16 @@
 #!/usr/bin/env bash
 
+# 'rofi' or 'dmenu' (default)
+GUI_MENU='dmenu'
+
 notify_err()
 {
 	notify-send "Error: ${1}"
+}
+
+notify_msg()
+{
+	notify-send "${1}"
 }
 
 cfg_file()
@@ -33,7 +41,34 @@ cfg_file()
 
 gui_menu()
 {
-	res=$(printf "%s" "${2}" | rofi -dmenu -p "$1")
+	if [[ "${GUI_MENU}" == 'rofi' ]]
+	then
+		res=$(printf "%s" "${2}" | rofi -dmenu -p "${1}")
+	else
+		res=$(printf "%s" "${2}" | dmenu -p "${1}")
+	fi
 
 	printf "%s" "${res}"
+}
+
+gui_menu_markup()
+{
+	if [[ "${GUI_MENU}" == 'rofi' ]]
+	then
+		res=$(printf "%s" "${2}" | rofi -dmenu -markup-rows -p "${1}")
+	else
+		res=$(printf "%s" "${2}" | dmenu -p "${1}")
+	fi
+
+	printf "%s" "${res}"
+}
+
+colored_text()
+{
+	if [[ "${GUI_MENU}" == 'rofi' ]]
+	then
+		printf "<span color='%s'>%s</span>\n" "${1}" "${2}"
+	else
+		printf '%s\n' "${2}"
+	fi
 }
