@@ -4,6 +4,7 @@ DIR="$(dirname "${0}")"
 source "${DIR}/lib.sh"
 
 CONFIGDIR=${XDG_CONFIG_HOME:-/tmp}
+CACHEDIR=${XDG_CACHE_HOME:-/tmp}
 CFG_FILE=$(cfg_file "${CONFIGDIR}/rofi-screenshot/scrot.conf")
 
 # Default opts
@@ -86,8 +87,7 @@ cfg_upload()
 	ANSWER=$(gui_menu "scrot/upload" \
 "< Back
 Catbox
-0x0
-Imgur")
+0x0")
 	case "${ANSWER}" in
 		''|'< Back') ;;
 		'Catbox'|'0x0'|'Imgur') CFG_UPLOAD="${ANSWER}" ;;
@@ -123,6 +123,38 @@ take_scrot()
 	fi
 }
 
+upload_scrot()
+{
+	filename="${CACHEDIR}/scrot.png"
+	sleep "${CFG_DELAY}"
+
+	case "${CFG_BACKEND}" in
+		'deepin') deepin-screen-recorder -n -s "${filename}" ;;
+		'maim') maim -s "${filename}" ;;
+		*) notify_err "Unknown backend '${CFG_BACKEND}'" && return 1 ;;
+	esac
+	if [[ ! -f "${filename}" ]]
+	then
+		notify_err "Failed to save '${filename}'"
+	fi
+
+	if [[ "${CFG_UPLOAD}" == "Catbox" ]]
+	then
+		url="$(curl -compressed --connect-timeout 5 -m 120 --retry 1 -F "reqtype=fileupload" -F "fileToUpload=@${filename}" "https://catbox.moe/user/api.php")"
+
+		notify_msg "$(printf "Screenshot uploaded! %s\n" "${url}")"
+		printf '%s\n' "${url}" | xsel -i -b
+	elif [[ "${CFG_UPLOAD}" == "0x0" ]]
+	then
+		url="$(curl -compressed --connect-timeout 5 -m 120 --retry 1 -F "file=@${filename}" "https://0x0.st")"
+
+		notify_msg "$(printf "Screenshot uploaded! %s\n" "${url}")"
+		printf '%s\n' "${url}" | xsel -i -b
+	else
+		notify_err "Unknown backend '${CFG_BACKEND}'"
+	fi
+}
+
 show_menu()
 {
 	ANSWER=$(gui_menu_markup 'scrot' \
@@ -137,6 +169,9 @@ $(colored_text cyan 'Save settings' || true)")
 	if [[ "${ANSWER}" =~ "Take screenshot" ]]
 	then
 		take_scrot
+	elif [[ "${ANSWER}" =~ "Upload screenshot" ]]
+	then
+		upload_scrot
 	elif [[ "${ANSWER}" =~ "Backend:"(.*) ]]
 	then
 		cfg_backend
