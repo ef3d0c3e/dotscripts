@@ -13,6 +13,7 @@ The screenshot script supports uploading to free image hosting providers.
 Currently the following upload sites are supported:
  - [Catbox](https://catbox.moe)
  - [0x0](https://0x0.st)
+
 Imgur used to be supported, but they changed their api and I can't access the site anymore.
 
 ## Showcase
@@ -44,6 +45,15 @@ bindsym $mod+c exec "$SCRIPTPATH/rofi/calculator.sh"
 
 # Screenshot on `PrintScreen`:
 bindsym --release Print exec "$SCRIPTPATH/rofi/screenshot.sh"
+```
+
+# Using dmenu instead of rofi
+
+All the scripts support using `dmenu` as a lightweight alternative to `rofi`.
+To use `dmenu`, change the `GUI_MENU` variable inside of `lib.sh` to `dmenu`:
+
+```
+GUI_MENU='dmenu'
 ```
 
 # License
